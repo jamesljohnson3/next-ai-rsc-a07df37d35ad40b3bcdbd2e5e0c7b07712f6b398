@@ -1,10 +1,10 @@
 "use server";
+
 import { getMutableAIState } from 'ai/rsc';
 import Groq from 'groq-sdk';
 import { createAI, createStreamableUI } from 'ai/rsc';
 import { sleep } from '@/lib/utils';
 import { BotCard, BotMessage, EventsSkeleton, Events, StocksSkeleton, Stocks, Purchase } from '@/components/llm-stocks';
-import { z } from 'zod';
 import { OpenAIStream, experimental_StreamingReactResponse, Message } from 'ai';
 
 const initialAIState: any[] = [];
@@ -81,15 +81,21 @@ export const AI = createAI({
           ],
           model: 'mixtral-8x7b-32768',
           stream: false,
-
         });
 
-        const assistantMessage = chatCompletion.choices[0]?.message?.content || '';
-
-        // Example response from the AI model, replace it with your actual response
-        const response: Message[] = [{ role: 'assistant', content: assistantMessage }];
-
+        const assistantMessage: Message = {
+          id: Date.now(),
+          role: 'assistant',
+          content: chatCompletion.choices[0]?.message?.content || '',
+        };
+        const response: Message[] = [assistantMessage];
         const stream = OpenAIStream(response);
+
+        const aiState = getMutableAIState<typeof AI>();
+        aiState.done([
+          ...aiState.get(),
+          assistantMessage,
+        ]);
 
         const streamingResponse = new experimental_StreamingReactResponse(stream, {
           ui({ content }) {
@@ -101,7 +107,7 @@ export const AI = createAI({
           },
         });
 
-        await consumeStream(stream); // Consume the stream only once
+        await consumeStream(stream); // Consume the stream
         return streamingResponse;
       } catch (error) {
         console.error('Error:', error);
