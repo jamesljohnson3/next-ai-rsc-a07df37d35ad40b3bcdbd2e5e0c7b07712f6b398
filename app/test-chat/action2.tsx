@@ -1,7 +1,7 @@
 'use server';
 import Groq from 'groq-sdk';
 import { OpenAIStream, experimental_StreamingReactResponse, Message } from 'ai';
-import { createAI, getMutableAIState, render } from "ai/rsc";
+import { createAI } from "ai/rsc";
 
 const groq = new Groq();
 
@@ -11,19 +11,32 @@ export async function handler({ messages }: { messages: Message[] }) {
     model: 'mixtral-8x7b-32768',
     stream: true,
     messages: messages as any,
-  }).then((response) => {
-    return OpenAIStream(response).map((info: any) => ({
-      role: info.role,
-      content: info.content,
-      name: info.name,
-    }));
   });
- 
-  // Respond with the stream
-  return new experimental_StreamingReactResponse(response, {
+
+  // Process the stream data
+  const stream = OpenAIStream(response);
+
+  // Read the stream as text
+  const reader = stream.getReader();
+  let data = '';
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      data += value;
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  // Convert the data to JSON
+  const responseData = JSON.parse(data);
+
+  // Respond with the processed data
+  return new experimental_StreamingReactResponse(responseData, {
     ui({ content }) {
       return (
-        <div className="bg-white dark:bg-white text-black  rounded-2xl mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
+        <div className="bg-white dark:bg-white text-black rounded-2xl mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
           {content}
         </div>
       );
