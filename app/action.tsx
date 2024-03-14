@@ -1,4 +1,5 @@
 "use server"
+import { experimental_StreamingReactResponse } from 'ai';
 import { getMutableAIState } from 'ai/rsc';
 import Groq from 'groq-sdk';
 import { createAI, createStreamableUI } from 'ai/rsc';
@@ -31,10 +32,15 @@ export const AI = createAI({
 
         uiStream.update(eventsComponent);
 
-        return {
-          id: Date.now(),
-          display: uiStream.value,
-        };
+        return new experimental_StreamingReactResponse(uiStream, {
+          ui({ content }) {
+            return (
+              <div className="bg-white dark:bg-white text-black rounded-2xl mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
+                {content}
+              </div>
+            );
+          },
+        });
       } catch (error) {
         console.error('Error fetching events:', error);
         return {
