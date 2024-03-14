@@ -6,7 +6,7 @@ import { createAI, createStreamableUI } from 'ai/rsc';
 import { sleep } from '@/lib/utils';
 import { BotCard, EventsSkeleton, Events, StocksSkeleton, Stocks, BotMessage, Purchase } from '@/components/llm-stocks';
 import { z } from 'zod';
-import { OpenAIStream, experimental_StreamingReactResponse, Message } from 'ai';
+import { OpenAIStream, Message, experimental_StreamingReactResponse } from 'ai';
 
 const initialAIState: any[] = [];
 const initialUIState: any[] = [];
@@ -80,10 +80,20 @@ export const AI = createAI({
           },
         ]);
 
-        return {
-          id: Date.now(),
-          display: assistantMessage,
-        };
+        const response: Message[] = [{ role: 'assistant', content: assistantMessage }];
+        const stream = OpenAIStream(response);
+
+        const streamingResponse = new experimental_StreamingReactResponse(stream, {
+          ui({ content }) {
+            return (
+              <div className="bg-white dark:bg-white text-black  rounded-2xl mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
+                {content}
+              </div>
+            );
+          }
+        });
+
+        return streamingResponse;
       } catch (error) {
         console.error('Error:', error);
         return {
@@ -139,20 +149,11 @@ export const AI = createAI({
       );
 
       uiStream.update(stocksComponent);
-      const response: Message[] = [{ role: 'assistant', content: uiStream.value }];
-      const stream = OpenAIStream(response);
 
-      const streamingResponse = new experimental_StreamingReactResponse(stream, {
-        ui({ content }) {
-          return (
-            <div className="bg-white dark:bg-white text-black  rounded-2xl mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
-              {content}
-            </div>
-          );
-        }
-      });
-
-      return streamingResponse;
+      return {
+        id: Date.now(),
+        display: uiStream.value,
+      };
     },
   },
   initialUIState,
