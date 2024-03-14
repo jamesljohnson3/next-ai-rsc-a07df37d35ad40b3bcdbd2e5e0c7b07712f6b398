@@ -24,11 +24,13 @@ import { z } from 'zod';
 import { StockSkeleton } from '@/components/llm-stocks/stock-skeleton';
 import { EventsSkeleton } from '@/components/llm-stocks/events-skeleton';
 import { StocksSkeleton } from '@/components/llm-stocks/stocks-skeleton';
+
+
+import Groq from 'groq-sdk';
 import { OpenAIStream, experimental_StreamingReactResponse, Message } from 'ai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || '',
-});
+const groq = new Groq();
+
 
 async function confirmPurchase(symbol: string, price: number, amount: number) {
   'use server';
@@ -113,8 +115,8 @@ async function submitUserMessage(content: string) {
     <BotMessage className="items-center">{spinner}</BotMessage>,
   );
 
-  const completion = runOpenAICompletion(openai, {
-    model: 'gpt-3.5-turbo',
+  const completion = runOpenAICompletion(groq, {
+    model: 'mixtral-8x7b-32768',
     stream: true,
     messages: [
       {
