@@ -1,13 +1,12 @@
 "use server"
-import { getMutableAIState } from 'ai/rsc';
+import { createAI, createStreamableUI, getMutableAIState } from 'ai/rsc';
 import Groq from 'groq-sdk';
-import { createAI, createStreamableUI } from 'ai/rsc';
-import { sleep } from '@/lib/utils';
-import { BotCard, EventsSkeleton, Events } from '@/components/llm-stocks';
+import { spinner, BotCard, BotMessage, SystemMessage, Events } from '@/components/llm-stocks';
+import { runAsyncFnWithoutBlocking, sleep, formatNumber } from '@/lib/utils';
+import { z } from 'zod';
+import { EventsSkeleton } from '@/components/llm-stocks/events-skeleton';
 
-// Define initial AI and UI state
-const initialAIState: any[] = [];
-const initialUIState: any[] = [];
+const groq = new Groq();
 
 // Create AI instance
 export const AI = createAI({
@@ -51,65 +50,7 @@ export const AI = createAI({
         };
       }
     },
-
-    // Define the submitUserMessage action
-    submitUserMessage: async (userInput: string) => {
-      // Update AI state with user input
-      const aiState = getMutableAIState<typeof AI>();
-      aiState.update([
-        ...aiState.get(),
-        {
-          role: 'user',
-          content: userInput,
-        },
-      ]);
-
-      try {
-        // Create a new Groq instance with your API key
-        const groq = new Groq({
-          apiKey: process.env.GROQ_API_KEY
-        });
-
-        // Call Groq API to generate completion for user message
-        const chatCompletion = await groq.chat.completions.create({
-          messages: [
-            { role: "system", content: "You are a personal branding expert, skilled at crafting LinkedIn profiles and resume cover letters. The following is a LinkedIn headline and About section for [NAME]. Your goal is to improve this profile.Suggest 5 alternative LinkedIn headlines of no more than 220 characters each that are both memorable and keyword-rich. Consider incorporating a unique value proposition and professional specialty.Then write a draft of a new, improved LinkedIn About section of no less than 2500 characters. Focus on structuring it with a clear narrative, showcasing achievements with quantifiable results, and including a call to action." },
-            { role: "user", content: userInput }
-          ],
-          model: 'mixtral-8x7b-32768',
-        });
-
-        // Process the response from Groq API
-        const assistantMessage = chatCompletion.choices[0]?.message?.content || '';
-
-        // Update AI state with assistant's response
-        const aiState = getMutableAIState<typeof AI>();
-        aiState.done([
-          ...aiState.get(),
-          {
-            role: 'assistant',
-            content: assistantMessage,
-          },
-        ]);
-
-        // Return assistant's response for display
-        return {
-          id: Date.now(),
-          display: assistantMessage,
-        };
-      } catch (error) {
-        // Handle errors
-        console.error('Error:', error);
-        // Return error message for display
-        return {
-          id: Date.now(),
-          display: 'An error occurred. Please try again later.',
-        };
-      }
-    },
-  },
-  initialUIState,
-  initialAIState,
+  }
 });
 
 // Simulate fetching events data
@@ -124,3 +65,141 @@ async function fetchEventData() {
     { date: '2024-03-25', headline: 'Event 3', description: 'Description of event 3' },
   ];
 }
+
+async function confirmPurchase(symbol: string, price: number, amount: number) {
+  'use server';
+
+  const aiStateConfirmPurchase = getMutableAIState<typeof AI>();
+
+  const purchasing = createStreamableUI(
+    <div className="inline-flex items-start gap-1 md:items-center">
+      {spinner}
+      <p className="mb-2">
+        Purchasing {amount} ${symbol}...
+      </p>
+    </div>,
+  );
+
+  const systemMessage = createStreamableUI(null);
+
+  runAsyncFnWithoutBlocking(async () => {
+    await sleep(1000);
+
+    purchasing.update(
+      <div className="inline-flex items-start gap-1 md:items-center">
+        {spinner}
+        <p className="mb-2">
+          Purchasing {amount} ${symbol}... working on it...
+        </p>
+      </div>,
+    );
+
+    await sleep(1000);
+
+    purchasing.done(
+      <div>
+        <p className="mb-2">
+          You have successfully purchased {amount} ${symbol}. Total cost:{' '}
+          {formatNumber(amount * price)}
+        </p>
+      </div>,
+    );
+
+    systemMessage.done(
+      <SystemMessage>
+        You have purchased {amount} shares of {symbol} at ${price}. Total cost ={' '}
+        {formatNumber(amount * price)}.
+      </SystemMessage>,
+    );
+
+    aiStateConfirmPurchase.done([
+      ...aiStateConfirmPurchase.get(),
+      {
+        role: 'system',
+        content: `[User has purchased ${amount} shares of ${symbol} at ${price}. Total cost = ${
+          amount * price
+        }]`,
+      },
+    ]);
+  });
+
+  return {
+    purchasingUI: purchasing.value,
+    newMessage: {
+      id: Date.now(),
+      display: systemMessage.value,
+    },
+  };
+}
+
+async function submitUserMessage(content: string) {
+  'use server';
+
+  const aiStateSubmitMessage = getMutableAIState<typeof AI>();
+  aiStateSubmitMessage.update([
+    ...aiStateSubmitMessage.get(),
+    {
+      role: 'user',
+      content,
+    },
+  ]);
+
+  const completion = await groq.chat.completions.create({
+    messages: [
+      {
+        role: 'system',
+        content: `\
+You are a stock trading conversation bot and you can help users buy stocks, step by step.
+You and the user can discuss stock prices and the user can adjust the amount of stocks they want to buy, or place an order, in the UI.
+
+Messages inside [] means that it's a UI element or a user event. For example:
+- "[Price of AAPL = 100]" means that an interface of the stock price of AAPL is shown to the user.
+- "[User has changed the amount of AAPL to 10]" means that the user has changed the amount of AAPL to 10 in the UI.
+
+If the user requests purchasing a stock, call \`show_stock_purchase_ui\` to show the purchase UI.
+If the user just wants the price, call \`show_stock_price\` to show the price.
+If you want to show trending stocks, call \`list_stocks\`.
+If you want to show events, call \`get_events\`.
+If the user wants to sell stock, or complete another impossible task, respond that you are a demo and cannot do that.
+
+Besides that, you can also chat with users and do some calculations if needed.`,
+      },
+      ...aiStateSubmitMessage.get().map((info: any) => ({
+        role: info.role,
+        content: info.content,
+        name: info.name,
+      })),
+    ],
+    model: 'mixtral-8x7b-32768',
+  });
+
+  const assistantMessage = completion.choices[0]?.message?.content || '';
+
+  const aiStateAssistantMessage = getMutableAIState<typeof AI>();
+  aiStateAssistantMessage.done([
+    ...aiStateAssistantMessage.get(),
+    {
+      role: 'assistant',
+      content: assistantMessage,
+    },
+  ]);
+
+  return {
+    id: Date.now(),
+    display: assistantMessage,
+  };
+}
+
+// Define necessary types and create the AI.
+
+const initialAIState: {
+  role: 'user' | 'assistant' | 'system' | 'function';
+  content: string;
+  id?: string;
+  name?: string;
+}[] = [];
+
+const initialUIState: {
+  id: number;
+  display: React.ReactNode;
+}[] = [];
