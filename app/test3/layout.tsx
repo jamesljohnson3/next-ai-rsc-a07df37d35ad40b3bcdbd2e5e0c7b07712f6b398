@@ -1,7 +1,7 @@
 
 
 
-import { AI } from "../action";
+import { AI } from "./actions";
 
 
 

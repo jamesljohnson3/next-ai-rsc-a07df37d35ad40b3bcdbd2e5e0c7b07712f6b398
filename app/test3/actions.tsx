@@ -5,7 +5,7 @@ import type OpenAI from 'openai';
 import zodToJsonSchema from 'zod-to-json-schema';
 import { TAnyToolDefinitionArray, TToolDefinitionMap } from '@/lib/utils/tool-definition';
 import Groq from 'groq-sdk';
-import { AI } from "../action";
+
 
 const groq = new Groq();
 
@@ -40,4 +40,25 @@ export async function submitUserMessage(content: string) {
   });
 }
 
-// Other utility functions and exports if any...
+
+const initialAIState: {
+    role: 'user' | 'assistant' | 'system' | 'function';
+    content: string;
+    id?: string;
+    name?: string;
+  }[] = [];
+  
+  const initialUIState: {
+    id: number;
+    display: React.ReactNode;
+  }[] = [];
+  
+export const AI = createAI({
+    actions: {
+      submitUserMessage,
+
+    },
+    initialUIState,
+    initialAIState,
+  });
+  
