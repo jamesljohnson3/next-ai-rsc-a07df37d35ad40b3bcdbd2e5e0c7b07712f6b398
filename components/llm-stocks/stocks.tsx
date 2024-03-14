@@ -9,7 +9,7 @@ export function Stocks({ stocks }: { stocks: any[] }) {
   const { submitUserMessage } = useActions<typeof AI>();
 
   return (
-    <div className="flex flex-col gap-2 pb-4 mb-4 overflow-y-scroll text-sm sm:flex-row">
+    <div className="flex flex-col gap-2 pb-4 mb-4  text-sm sm:flex-row">
       {stocks.map(stock => (
         <button
           key={stock.symbol}
