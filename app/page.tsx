@@ -1,10 +1,11 @@
 'use client';
+
 import { useEffect, useRef, useState } from 'react';
 
 import { useUIState, useActions } from 'ai/rsc';
 import { UserMessage } from '@/components/llm-stocks/message';
 
-import { AI } from './action'; // Import AI type
+import { type AI } from './action';
 import { ChatScrollAnchor } from '@/lib/hooks/chat-scroll-anchor';
 import { FooterText } from '@/components/footer';
 import Textarea from 'react-textarea-autosize';
@@ -80,7 +81,7 @@ export default function Page() {
           <EmptyScreen
             submitMessage={async message => {
               // Add user message UI
-              setMessages((currentMessages: any) => [
+              setMessages(currentMessages => [
                 ...currentMessages,
                 {
                   id: Date.now(),
@@ -90,7 +91,7 @@ export default function Page() {
 
               // Submit and get response message
               const responseMessage = await submitUserMessage(message);
-              setMessages((currentMessages: any) => [
+              setMessages(currentMessages => [
                 ...currentMessages,
                 responseMessage,
               ]);
@@ -117,7 +118,7 @@ export default function Page() {
                 if (!value) return;
 
                 // Add user message UI
-                setMessages((currentMessages: any) => [
+                setMessages(currentMessages => [
                   ...currentMessages,
                   {
                     id: Date.now(),
@@ -128,7 +129,7 @@ export default function Page() {
                 try {
                   // Submit and get response message
                   const responseMessage = await submitUserMessage(value);
-                  setMessages((currentMessages: any) => [
+                  setMessages(currentMessages => [
                     ...currentMessages,
                     responseMessage,
                   ]);
@@ -185,14 +186,14 @@ export default function Page() {
                     </TooltipTrigger>
                     <TooltipContent>Send message</TooltipContent>
                   </Tooltip>
-                </div>
-              </div>
-              <button
+                  <button
                 className="px-4 py-2 text-white bg-green-500 rounded-lg hover:bg-green-600 focus:outline-none focus:bg-green-600"
                 onClick={handleGetEvents}
               >
                 Get Events
               </button>
+                </div>
+              </div>
             </form>
             <FooterText className="hidden sm:block" />
           </div>
