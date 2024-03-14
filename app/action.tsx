@@ -1,10 +1,11 @@
-"use server"
+"use server";
 import { getMutableAIState } from 'ai/rsc';
 import Groq from 'groq-sdk';
 import { createAI, createStreamableUI } from 'ai/rsc';
 import { sleep } from '@/lib/utils';
-import { BotCard, EventsSkeleton, Events, StocksSkeleton, Stocks, BotMessage, Purchase } from '@/components/llm-stocks';
+import { BotCard, BotMessage, EventsSkeleton, Events, StocksSkeleton, Stocks, Purchase } from '@/components/llm-stocks';
 import { z } from 'zod';
+import { OpenAIStream, experimental_StreamingReactResponse, Message } from 'ai';
 
 const initialAIState: any[] = [];
 const initialUIState: any[] = [];
@@ -79,9 +80,12 @@ export const AI = createAI({
             { role: "user", content: userInput }
           ],
           model: 'mixtral-8x7b-32768',
+
         });
 
         const assistantMessage = chatCompletion.choices[0]?.message?.content || '';
+        const response = ''; // Provide the correct response here
+        const stream = OpenAIStream(assistantMessage);
 
         const aiState = getMutableAIState<typeof AI>();
         aiState.done([
@@ -92,10 +96,15 @@ export const AI = createAI({
           },
         ]);
 
-        return {
-          id: Date.now(),
-          display: assistantMessage,
-        };
+        return new experimental_StreamingReactResponse(stream, {
+          ui({ content }) {
+            return (
+              <div className="bg-white dark:bg-white text-black  rounded-2xl mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
+                {content}
+              </div>
+            );
+          },
+        });
       } catch (error) {
         console.error('Error:', error);
         return {
