@@ -1,4 +1,6 @@
 "use server"
+"use server";
+
 import { createAI, createStreamableUI, getMutableAIState } from 'ai/rsc';
 import Groq from 'groq-sdk';
 import { spinner, BotCard, BotMessage, SystemMessage, Events } from '@/components/llm-stocks';
@@ -67,9 +69,7 @@ async function fetchEventData() {
 }
 
 async function confirmPurchase(symbol: string, price: number, amount: number) {
-  'use server';
-
-  const aiStateConfirmPurchase = getMutableAIState<typeof AI>();
+  const aiState = getMutableAIState<typeof AI>();
 
   const purchasing = createStreamableUI(
     <div className="inline-flex items-start gap-1 md:items-center">
@@ -112,8 +112,8 @@ async function confirmPurchase(symbol: string, price: number, amount: number) {
       </SystemMessage>,
     );
 
-    aiStateConfirmPurchase.done([
-      ...aiStateConfirmPurchase.get(),
+    aiState.done([
+      ...aiState.get(),
       {
         role: 'system',
         content: `[User has purchased ${amount} shares of ${symbol} at ${price}. Total cost = ${
@@ -133,17 +133,16 @@ async function confirmPurchase(symbol: string, price: number, amount: number) {
 }
 
 async function submitUserMessage(content: string) {
-  'use server';
-
-  const aiStateSubmitMessage = getMutableAIState<typeof AI>();
-  aiStateSubmitMessage.update([
-    ...aiStateSubmitMessage.get(),
+  const aiState = getMutableAIState<typeof AI>();
+  aiState.update([
+    ...aiState.get(),
     {
       role: 'user',
       content,
     },
   ]);
 
+  // Use groq to generate a response based on user input
   const completion = await groq.chat.completions.create({
     messages: [
       {
@@ -164,7 +163,7 @@ If the user wants to sell stock, or complete another impossible task, respond th
 
 Besides that, you can also chat with users and do some calculations if needed.`,
       },
-      ...aiStateSubmitMessage.get().map((info: any) => ({
+      ...aiState.get().map((info: any) => ({
         role: info.role,
         content: info.content,
         name: info.name,
@@ -173,17 +172,19 @@ Besides that, you can also chat with users and do some calculations if needed.`,
     model: 'mixtral-8x7b-32768',
   });
 
+  // Extract the assistant's message from the completion
   const assistantMessage = completion.choices[0]?.message?.content || '';
 
-  const aiStateAssistantMessage = getMutableAIState<typeof AI>();
-  aiStateAssistantMessage.done([
-    ...aiStateAssistantMessage.get(),
+  // Update the AI state with the assistant's message
+  aiState.done([
+    ...aiState.get(),
     {
       role: 'assistant',
       content: assistantMessage,
     },
   ]);
 
+  // Return the assistant's message and display it
   return {
     id: Date.now(),
     display: assistantMessage,
@@ -191,7 +192,6 @@ Besides that, you can also chat with users and do some calculations if needed.`,
 }
 
 // Define necessary types and create the AI.
-
 const initialAIState: {
   role: 'user' | 'assistant' | 'system' | 'function';
   content: string;
