@@ -94,7 +94,7 @@ export const AI = createAI({
 
         return {
           id: Date.now(),
-          display: <BotCard><BotMessage>{assistantMessage}</BotMessage></BotCard>,
+          display: <div className="bg-white rounded-2xl"><div className='text-black'>{assistantMessage}</div></div>,
         };
       } catch (error) {
         console.error('Error:', error);
