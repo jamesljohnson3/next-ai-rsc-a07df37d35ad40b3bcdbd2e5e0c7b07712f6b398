@@ -4,6 +4,7 @@ import { GeistSans } from 'geist/font/sans';
 import { Analytics } from '@vercel/analytics/react';
 import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
+import { ClerkProvider } from "@clerk/nextjs";
 
 import { AI } from './action';
 import { Header } from '@/components/header';
@@ -46,10 +47,14 @@ export const viewport = {
 
 export default function RootLayout({
   children,
+  authModal,
+
 }: Readonly<{
   children: React.ReactNode;
+  authModal: React.ReactNode
+
 }>) {
-  return (
+  return (<ClerkProvider>
     <html lang="en" suppressHydrationWarning>
       <body
         className={`font-sans antialiased ${GeistSans.variable} ${GeistMono.variable}`}
@@ -65,14 +70,14 @@ export default function RootLayout({
             <div className="flex flex-col min-h-screen">
               <Header />
               <main className="flex flex-col flex-1 bg-muted/50 dark:bg-background">
-                {children}
+              {authModal}     {children}
               </main>
             </div>
           </Providers>
         </AI>
         <Analytics />
       </body>
-    </html>
+    </html></ClerkProvider>
   );
 }
 
