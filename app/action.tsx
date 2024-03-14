@@ -1,4 +1,3 @@
-"use server"
 "use server";
 
 import { createAI, createStreamableUI, getMutableAIState } from 'ai/rsc';
@@ -9,6 +8,12 @@ import { z } from 'zod';
 import { EventsSkeleton } from '@/components/llm-stocks/events-skeleton';
 
 const groq = new Groq();
+
+// Define necessary types and create the initial UI state
+const initialUIState: {
+  id: number;
+  display: React.ReactNode;
+}[] = [];
 
 // Create AI instance
 export const AI = createAI({
@@ -52,7 +57,8 @@ export const AI = createAI({
         };
       }
     },
-  }
+  },
+  initialUIState, // Pass initialUIState here
 });
 
 // Simulate fetching events data
@@ -197,9 +203,4 @@ const initialAIState: {
   content: string;
   id?: string;
   name?: string;
-}[] = [];
-
-const initialUIState: {
-  id: number;
-  display: React.ReactNode;
 }[] = [];
