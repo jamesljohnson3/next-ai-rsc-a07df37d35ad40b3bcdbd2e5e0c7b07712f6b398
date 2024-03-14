@@ -81,7 +81,7 @@ export default function Page() {
           <EmptyScreen
             submitMessage={async message => {
               // Add user message UI
-              setMessages(currentMessages => [
+              setMessages((currentMessages: any) => [
                 ...currentMessages,
                 {
                   id: Date.now(),
@@ -91,7 +91,7 @@ export default function Page() {
 
               // Submit and get response message
               const responseMessage = await submitUserMessage(message);
-              setMessages(currentMessages => [
+              setMessages((currentMessages: any) => [
                 ...currentMessages,
                 responseMessage,
               ]);
@@ -118,7 +118,7 @@ export default function Page() {
                 if (!value) return;
 
                 // Add user message UI
-                setMessages(currentMessages => [
+                setMessages((currentMessages: any) => [
                   ...currentMessages,
                   {
                     id: Date.now(),
@@ -129,7 +129,7 @@ export default function Page() {
                 try {
                   // Submit and get response message
                   const responseMessage = await submitUserMessage(value);
-                  setMessages(currentMessages => [
+                  setMessages((currentMessages: any) => [
                     ...currentMessages,
                     responseMessage,
                   ]);
