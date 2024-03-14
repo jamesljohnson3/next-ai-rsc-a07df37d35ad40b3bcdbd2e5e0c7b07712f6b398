@@ -1,13 +1,12 @@
 
 "use server"
-
 import { getMutableAIState } from 'ai/rsc';
 import Groq from 'groq-sdk';
 import { createAI, createStreamableUI } from 'ai/rsc';
 import { sleep } from '@/lib/utils';
 import { BotCard, EventsSkeleton, Events, StocksSkeleton, Stocks, BotMessage, Purchase } from '@/components/llm-stocks';
 import { z } from 'zod';
-import { OpenAIStream, experimental_StreamingReactResponse, Message } from 'ai'; // Import OpenAIStream and experimental_StreamingReactResponse
+import { OpenAIStream, experimental_StreamingReactResponse, Message } from 'ai';
 
 const initialAIState: any[] = [];
 const initialUIState: any[] = [];
@@ -140,7 +139,6 @@ export const AI = createAI({
       );
 
       uiStream.update(stocksComponent);
-
       const response: Message[] = [{ role: 'assistant', content: uiStream.value }];
       const stream = OpenAIStream(response);
 
@@ -153,8 +151,6 @@ export const AI = createAI({
           );
         }
       });
-
-      await consumeStream(stream);
 
       return streamingResponse;
     },
@@ -171,11 +167,3 @@ async function fetchEventData() {
     { date: '2024-03-25', headline: 'Event 3', description: 'Description of event 3' },
   ];
 }
-
-const consumeStream = async (stream: ReadableStream) => {
-  const reader = stream.getReader();
-  while (true) {
-    const { done } = await reader.read();
-    if (done) break;
-  }
-};
