@@ -31,7 +31,7 @@ export async function submitUserMessage(content: string) {
     ui({ content }) {
       return (
         <div className="bg-white dark:bg-white text-black  rounded-2xl mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
-          {content} 
+         wow {content} 
         </div>
       );
     },
