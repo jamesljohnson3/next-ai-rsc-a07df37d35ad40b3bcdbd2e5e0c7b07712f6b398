@@ -1,7 +1,9 @@
 'use server';
 import Groq from 'groq-sdk';
 import { OpenAIStream, experimental_StreamingReactResponse, Message } from 'ai';
-import { createAI } from "ai/rsc";
+import { createAI, getMutableAIState, createStreamableUI } from "ai/rsc";
+import { runOpenAICompletion } from '@/lib/utils';
+import { BotMessage, spinner } from '@/components/llm-stocks';
 
 const groq = new Groq();
 
@@ -44,6 +46,34 @@ export async function handler({ messages }: { messages: Message[] }) {
   });
 }
 
+// Define submitUserMessage function
+async function submitUserMessage(content: string) {
+  'use server';
+
+  const aiState = getMutableAIState();
+  aiState.update([
+    ...aiState.get(),
+    {
+      role: 'user',
+      content,
+    },
+  ]);
+  
+  const reply = createStreamableUI(
+    <BotMessage className="items-center">{spinner}</BotMessage>,
+  );
+  
+  const completion = runOpenAICompletion(groq, {
+    model: 'mixtral-8x7b-32768',
+    prompt: content,
+  });
+  
+  return {
+    id: Date.now(),
+    display: reply,
+  };
+}
+
 // Define the initial state of the AI. It can be any JSON object.
 const initialAIState: {
   role: 'user' | 'assistant' | 'system' | 'function';
@@ -68,8 +98,3 @@ export const AI = createAI({
   initialUIState,
   initialAIState
 });
-
-// Define submitUserMessage function
-async function submitUserMessage(userInput: string) {
-  // Implementation goes here
-}
