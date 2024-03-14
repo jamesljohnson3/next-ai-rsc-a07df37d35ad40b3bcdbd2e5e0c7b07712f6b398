@@ -22,7 +22,7 @@ import { EmptyScreen } from '@/components/empty-screen';
 
 export default function Page() {
   const [messages, setMessages] = useUIState<typeof AI>();
-  const { submitUserMessage } = useActions<typeof AI>();
+  const { submitUserMessage, get_events } = useActions<typeof AI>(); // Destructure the actions from AI context
   const [inputValue, setInputValue] = useState('');
   const { formRef, onKeyDown } = useEnterSubmit();
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -50,6 +50,25 @@ export default function Page() {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [inputRef]);
+
+  // Function to handle sending the "get_events" action
+  const handleGetEvents = async () => {
+    setMessages((currentMessages: any) => [
+      ...currentMessages,
+      {
+        id: Date.now(),
+        display: <UserMessage>"/get_events"</UserMessage>,
+      },
+    ]);
+
+    try {
+      // Call the "get_events" action
+      const responseMessage = await get_events();
+      setMessages((currentMessages: any) => [...currentMessages, responseMessage]);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div>
@@ -167,6 +186,12 @@ export default function Page() {
                     </TooltipTrigger>
                     <TooltipContent>Send message</TooltipContent>
                   </Tooltip>
+                  <button
+                className="px-4 py-2 text-white bg-green-500 rounded-lg hover:bg-green-600 focus:outline-none focus:bg-green-600"
+                onClick={handleGetEvents}
+              >
+                Get Events
+              </button>
                 </div>
               </div>
             </form>
