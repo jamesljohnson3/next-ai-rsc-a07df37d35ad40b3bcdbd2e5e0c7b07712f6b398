@@ -1,9 +1,9 @@
 "use server"
 import { createAI, getMutableAIState } from "ai/rsc";
-import { OpenAIStream, experimental_StreamingReactResponse, Message } from 'ai';
-import { sleep } from '@/lib/utils';
+import { OpenAIStream, experimental_StreamingReactResponse } from 'ai';
 import Groq from 'groq-sdk';
 import React from 'react';
+import { sleep } from "@/lib/utils";
 
 const groq = new Groq();
 
