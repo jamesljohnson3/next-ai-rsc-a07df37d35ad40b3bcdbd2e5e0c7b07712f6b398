@@ -1,10 +1,10 @@
-"use server";
+"use server"
 import { getMutableAIState } from 'ai/rsc';
 import Groq from 'groq-sdk';
 import { createAI, createStreamableUI } from 'ai/rsc';
 import { sleep } from '@/lib/utils';
 import { BotCard, EventsSkeleton, Events, StocksSkeleton, Stocks, BotMessage, Purchase } from '@/components/llm-stocks';
-import { OpenAIStream, experimental_StreamingReactResponse, Message } from 'ai';
+import { z } from 'zod';
 
 const initialAIState: any[] = [];
 const initialUIState: any[] = [];
@@ -61,7 +61,21 @@ export const AI = createAI({
 
         const chatCompletion = await groq.chat.completions.create({
           messages: [
-            { role: "system", content: `Your message content...` },
+            { role: "system", content: `\
+            You are a stock trading conversation bot and you can help users buy stocks, step by step.
+            You and the user can discuss stock prices and the user can adjust the amount of stocks they want to buy, or place an order, in the UI.
+            
+            Messages inside [] means that it's a UI element or a user event. For example:
+            - "[Price of AAPL = 100]" means that an interface of the stock price of AAPL is shown to the user.
+            - "[User has changed the amount of AAPL to 10]" means that the user has changed the amount of AAPL to 10 in the UI.
+            
+            If the user requests purchasing a stock, call \`show_stock_purchase_ui\` to show the purchase UI.
+            If the user just wants the price, call \`show_stock_price\` to show the price.
+            If you want to show trending stocks, call \`list_stocks\`.
+            If you want to show events, call \`get_events\`.
+            If the user wants to sell stock, or complete another impossible task, respond that you are a demo and cannot do that.
+            
+            Besides that, you can also chat with users and do some calculations if needed.` },
             { role: "user", content: userInput }
           ],
           model: 'mixtral-8x7b-32768',
@@ -78,22 +92,10 @@ export const AI = createAI({
           },
         ]);
 
-        const response: Message[] = [{ role: 'assistant', content: assistantMessage }];
-        const stream = OpenAIStream(response);
-
-        const streamingResponse = new experimental_StreamingReactResponse(stream, {
-          ui({ content }) {
-            return (
-              <div className="bg-white dark:bg-white text-black  rounded-2xl mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
-                {content}
-              </div>
-            );
-          },
-        });
-
-        await consumeStream(stream);
-
-        return streamingResponse;
+        return {
+          id: Date.now(),
+          display: assistantMessage,
+        };
       } catch (error) {
         console.error('Error:', error);
         return {
@@ -168,11 +170,3 @@ async function fetchEventData() {
     { date: '2024-03-25', headline: 'Event 3', description: 'Description of event 3' },
   ];
 }
-
-const consumeStream = async (stream: ReadableStream) => {
-  const reader = stream.getReader();
-  while (true) {
-    const { done } = await reader.read();
-    if (done) break;
-  }
-};
