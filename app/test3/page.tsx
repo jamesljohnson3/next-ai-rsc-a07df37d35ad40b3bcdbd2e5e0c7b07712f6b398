@@ -1,7 +1,7 @@
 "use client"
 import { useState } from 'react';
 import { useUIState, useActions } from "ai/rsc";
-import { AI } from '../action';
+import { AI } from './actions';
 
 export default function Page() {
   const [inputValue, setInputValue] = useState('');
@@ -19,15 +19,20 @@ export default function Page() {
       <form onSubmit={async (e) => {
         e.preventDefault();
 
+        const userMessage = {
+          id: Date.now(),
+          display: <div>{inputValue}</div>,
+        };
         setMessages((currentMessages) => [
           ...currentMessages,
-          {
-            id: Date.now(),
-            display: <div>{inputValue}</div>,
-          },
+          userMessage,
         ]);
 
-        const responseMessage = await submitUserMessage(inputValue);
+        const response = await submitUserMessage(inputValue);
+        const responseMessage = {
+          id: Date.now() + 1, // Adjust the ID as needed
+          display: response.ui, // Assuming response.ui is the correct property
+        };
         setMessages((currentMessages) => [
           ...currentMessages,
           responseMessage,

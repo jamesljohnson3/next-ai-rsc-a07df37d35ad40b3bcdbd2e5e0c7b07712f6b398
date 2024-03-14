@@ -1,11 +1,9 @@
-import { createAI, getMutableAIState, render } from "ai/rsc";
-import { z } from "zod";
-import { OpenAIStream, experimental_StreamingReactResponse, Message } from 'ai';
+import { createAI, getMutableAIState } from "ai/rsc";
+import { OpenAIStream, experimental_StreamingReactResponse } from 'ai';
 import type OpenAI from 'openai';
 import zodToJsonSchema from 'zod-to-json-schema';
 import { TAnyToolDefinitionArray, TToolDefinitionMap } from '@/lib/utils/tool-definition';
 import Groq from 'groq-sdk';
-
 
 const groq = new Groq();
 
@@ -40,25 +38,25 @@ export async function submitUserMessage(content: string) {
   });
 }
 
-
+// Define the initial state of the AI. It can be any JSON object.
 const initialAIState: {
-    role: 'user' | 'assistant' | 'system' | 'function';
-    content: string;
-    id?: string;
-    name?: string;
-  }[] = [];
-  
-  const initialUIState: {
-    id: number;
-    display: React.ReactNode;
-  }[] = [];
-  
-export const AI = createAI({
-    actions: {
-      submitUserMessage,
+  role: 'user' | 'assistant' | 'system' | 'function';
+  content: string;
+  id?: string;
+  name?: string;
+}[] = [];
 
-    },
-    initialUIState,
-    initialAIState,
-  });
-  
+// The initial UI state that the client will keep track of, which contains the message IDs and their UI nodes.
+const initialUIState: {
+  id: number;
+  display: React.ReactNode;
+}[] = [];
+
+// Create the AI instance
+export const AI = createAI({
+  actions: {
+    submitUserMessage,
+  },
+  initialUIState,
+  initialAIState,
+});
