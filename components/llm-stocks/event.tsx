@@ -8,7 +8,7 @@ interface Event {
 
 export function Events({ events }: { events: Event[] }) {
   return (
-    <div className="flex flex-col sm:flex-row gap-2 overflow-scroll py-4 -mt-2">
+    <div className="flex flex-col sm:flex-row gap-2  py-4 -mt-2">
       {events.map(event => (
         <div
           key={event.date}
