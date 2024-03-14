@@ -1,11 +1,9 @@
 'use client';
-
 import { useEffect, useRef, useState } from 'react';
-
 import { useUIState, useActions } from 'ai/rsc';
 import { UserMessage } from '@/components/llm-stocks/message';
-
 import { type AI } from './action';
+
 import { ChatScrollAnchor } from '@/lib/hooks/chat-scroll-anchor';
 import { FooterText } from '@/components/footer';
 import Textarea from 'react-textarea-autosize';
@@ -22,7 +20,7 @@ import { EmptyScreen } from '@/components/empty-screen';
 
 export default function Page() {
   const [messages, setMessages] = useUIState<typeof AI>();
-  const { submitUserMessage, get_events } = useActions<typeof AI>(); // Destructure the actions from AI context
+  const { submitUserMessage, get_events, show_stock_purchase_ui, list_stocks } = useActions<typeof AI>(); // Make sure submitUserMessage is included
   const [inputValue, setInputValue] = useState('');
   const { formRef, onKeyDown } = useEnterSubmit();
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -64,6 +62,28 @@ export default function Page() {
     try {
       // Call the "get_events" action
       const responseMessage = await get_events();
+      setMessages((currentMessages: any) => [...currentMessages, responseMessage]);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // Function to handle showing the stock purchase UI
+  const handleShowStockPurchaseUI = async () => {
+    try {
+      // Call the "show_stock_purchase_ui" action
+      const responseMessage = await show_stock_purchase_ui({ symbol: 'AAPL', price: 100 }); // Example values, replace with actual data
+      setMessages((currentMessages: any) => [...currentMessages, responseMessage]);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // Function to handle listing stocks
+  const handleListStocks = async () => {
+    try {
+      // Call the "list_stocks" action
+      const responseMessage = await list_stocks({ stocks: [{ symbol: 'AAPL', price: 100, delta: 2 }] }); // Example values, replace with actual data
       setMessages((currentMessages: any) => [...currentMessages, responseMessage]);
     } catch (error) {
       console.error(error);
@@ -187,11 +207,23 @@ export default function Page() {
                     <TooltipContent>Send message</TooltipContent>
                   </Tooltip>
                   <button
-                className="px-4 py-2 text-white bg-green-500 rounded-lg hover:bg-green-600 focus:outline-none focus:bg-green-600"
-                onClick={handleGetEvents}
-              >
-                Get Events
-              </button>
+                    className="px-4 py-2 text-white bg-green-500 rounded-lg hover:bg-green-600 focus:outline-none focus:bg-green-600"
+                    onClick={handleGetEvents}
+                  >
+                    Get Events
+                  </button>
+                  <button
+                    className="px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:bg-blue-600 ml-2"
+                    onClick={handleShowStockPurchaseUI}
+                  >
+                    Show Stock Purchase UI
+                  </button>
+                  <button
+                    className="px-4 py-2 text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 focus:outline-none focus:bg-yellow-600 ml-2"
+                    onClick={handleListStocks}
+                  >
+                    List Stocks
+                  </button>
                 </div>
               </div>
             </form>
