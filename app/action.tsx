@@ -1,4 +1,4 @@
-"use server";
+"use server"
 import { getMutableAIState } from 'ai/rsc';
 import Groq from 'groq-sdk';
 import { createAI, createStreamableUI } from 'ai/rsc';
@@ -98,7 +98,7 @@ export const AI = createAI({
           },
         ]);
 
-        return new experimental_StreamingReactResponse(stream, {
+        const streamingResponse = new experimental_StreamingReactResponse(stream, {
           ui({ content }) {
             return (
               <div className="bg-white dark:bg-white text-black  rounded-2xl mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
@@ -107,6 +107,9 @@ export const AI = createAI({
             );
           },
         });
+
+        await consumeStream(stream); // Consume the stream
+        return streamingResponse;
       } catch (error) {
         console.error('Error:', error);
         return {
@@ -181,3 +184,11 @@ async function fetchEventData() {
     { date: '2024-03-25', headline: 'Event 3', description: 'Description of event 3' },
   ];
 }
+
+const consumeStream = async (stream: ReadableStream) => {
+  const reader = stream.getReader();
+  while (true) {
+    const { done } = await reader.read();
+    if (done) break;
+  }
+};
