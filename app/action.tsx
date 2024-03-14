@@ -80,12 +80,14 @@ export const AI = createAI({
             { role: "user", content: userInput }
           ],
           model: 'mixtral-8x7b-32768',
+          stream: false,
 
         });
 
         const assistantMessage = chatCompletion.choices[0]?.message?.content || '';
-        const response = ''; // Provide the correct response here
-        const stream = OpenAIStream(assistantMessage);
+        // Fetch response from the server or some other source
+        const response: Message[] = [];
+        const stream = OpenAIStream(response);
 
         const aiState = getMutableAIState<typeof AI>();
         aiState.done([
