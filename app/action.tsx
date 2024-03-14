@@ -73,10 +73,8 @@ export const AI = createAI({
         // Call Groq API to generate completion for user message
         const chatCompletion = await groq.chat.completions.create({
           messages: [
-            {
-              role: 'user',
-              content: userInput,
-            },
+            { role: "system", content: "You are a digital artist conversation bot and you can help users see helpful colors or styles, in the UI." },
+            { role: "user", content: userInput }
           ],
           model: 'mixtral-8x7b-32768',
         });

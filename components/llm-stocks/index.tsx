@@ -35,4 +35,4 @@ const Events = dynamic(() => import('./event').then(mod => mod.Events), {
   loading: () => <EventsSkeleton />,
 });
 
-export { Stock, Purchase, Stocks, Events };
+export { Stock, Purchase, Stocks, Events, EventsSkeleton };
