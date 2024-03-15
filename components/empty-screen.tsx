@@ -1,21 +1,21 @@
 import { Button } from '@/components/ui/button';
 import { ExternalLink } from '@/components/external-link';
 import { IconArrowRight } from '@/components/ui/icons';
-
 const exampleMessages = [
   {
-    heading: 'What are the trending stocks?',
-    message: 'What are the trending stocks?',
+    heading: 'How can I modify the color of my website?',
+    message: 'How can I modify the color of my website?',
   },
   {
-    heading: "What's the stock price of AAPL?",
-    message: "What's the stock price of AAPL?",
+    heading: 'Can you suggest a marketing strategy?',
+    message: 'Can you suggest a marketing strategy?',
   },
   {
-    heading: "I'd like to buy 10 shares of MSFT",
-    message: "I'd like to buy 10 shares of MSFT",
+    heading: 'I need help creating a logo for my brand',
+    message: 'I need help creating a logo for my brand',
   },
 ];
+
 
 export function EmptyScreen({
   submitMessage,
