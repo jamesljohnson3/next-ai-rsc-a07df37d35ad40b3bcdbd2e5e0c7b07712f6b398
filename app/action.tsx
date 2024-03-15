@@ -1,7 +1,6 @@
 "use server"
-import { getMutableAIState } from 'ai/rsc';
+import { createAI,createStreamableUI, getMutableAIState } from "@/lib/ai/rsc/dist";
 import Groq from 'groq-sdk';
-import { createAI, createStreamableUI } from 'ai/rsc';
 import { sleep } from '@/lib/utils';
 import { BotCard, EventsSkeleton, Events, StocksSkeleton, Stocks, BotMessage, Purchase } from '@/components/llm-stocks';
 import { z } from 'zod';
