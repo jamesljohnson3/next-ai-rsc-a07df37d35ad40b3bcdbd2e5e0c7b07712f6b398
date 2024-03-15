@@ -15,7 +15,7 @@ export default async function Filter({
           <h2 className="text-lg font-semibold mb-2">Stock Prices for Microsoft (MSFT)</h2>
           {/* Render stock prices for Microsoft here */}
       
-      <>hello  2</>
+      <>{content}</>
           {/* Assuming StockPrices component accepts a prop 'symbol' to fetch specific stock price */}
         </div>
       )}
