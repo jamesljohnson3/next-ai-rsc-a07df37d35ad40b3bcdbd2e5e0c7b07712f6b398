@@ -95,7 +95,7 @@ export const AI = createAI({
 
         return {
           id: Date.now(),
-          display: <CustomFilter content={assistantMessage}><div className='border shadow-xl bg-muted'>hello  world</div></CustomFilter>,
+          display: <CustomFilter content={assistantMessage}><div className='border shadow-xl bg-muted'>{assistantMessage}</div></CustomFilter>,
         };
       } catch (error) {
         console.error('Error:', error);
