@@ -5,7 +5,7 @@ import { createAI, createStreamableUI } from 'ai/rsc';
 import { sleep } from '@/lib/utils';
 import { BotCard, EventsSkeleton, Events, StocksSkeleton, Stocks, BotMessage, Purchase } from '@/components/llm-stocks';
 import { z } from 'zod';
-
+import  CustomFilter from  "./filter"
 const initialAIState: any[] = [];
 const initialUIState: any[] = [];
 
@@ -94,7 +94,7 @@ export const AI = createAI({
 
         return {
           id: Date.now(),
-          display: <div className="bg-white rounded-2xl"><div className='text-black'>{assistantMessage}</div></div>,
+          display: <CustomFilter><div className='border shadow-xl bg-muted'>{assistantMessage}</div></CustomFilter>,
         };
       } catch (error) {
         console.error('Error:', error);
