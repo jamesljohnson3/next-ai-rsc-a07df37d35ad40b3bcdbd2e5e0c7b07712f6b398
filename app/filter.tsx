@@ -6,7 +6,7 @@ export default async function Filter({
   content: string;
 }) {
   // Check if the show_stock_price command is detected for Microsoft (MSFT)
-  const isShowStockPriceCommandDetected = content.includes('show_stock_price("MSFT")');
+  const isShowStockPriceCommandDetected = content.includes('show_stock_price');
 
   return (
     <div className="flex flex-col sm:flex-row gap-2 py-4 -mt-2">
