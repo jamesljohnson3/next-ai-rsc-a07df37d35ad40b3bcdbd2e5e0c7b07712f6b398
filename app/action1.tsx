@@ -5,7 +5,7 @@ import { createAI, createStreamableUI } from 'ai/rsc';
 import { sleep } from '@/lib/utils';
 import { BotCard, EventsSkeleton, Events, StocksSkeleton, Stocks, BotMessage, Purchase } from '@/components/llm-stocks';
 import { z } from 'zod';
-import  CustomFilter from  "./filter"
+import  CustomFilter from  "./filter2"
 const initialAIState: any[] = [];
 const initialUIState: any[] = [];
 
