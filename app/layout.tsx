@@ -10,7 +10,7 @@ import { SidebarDesktop } from '@/components/sidebar-desktop'
 import { AI } from './action';
 import { Header } from '@/components/header';
 import { Providers } from '@/components/providers';
-import { Providers2 } from './providers';
+
 
 const meta = {
   title: 'AI RSC Demo',
