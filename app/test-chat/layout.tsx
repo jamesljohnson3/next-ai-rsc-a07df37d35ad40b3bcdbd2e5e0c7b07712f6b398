@@ -1,5 +1,4 @@
- import './globals.css';
-
+ 
 import { AI } from '../action';
  
 export default function RootLayout({

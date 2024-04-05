@@ -1,5 +1,4 @@
- import './globals.css';
- import { SidebarDesktop } from '@/components/sidebar-desktop'
+  import { SidebarDesktop } from '@/components/sidebar-desktop'
 
 import { AI } from '../action';
  
