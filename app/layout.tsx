@@ -10,6 +10,7 @@ import { SidebarDesktop } from '@/components/sidebar-desktop'
 import { AI } from './action';
 import { Header } from '@/components/header';
 import { Providers } from '@/components/providers';
+import { Providers2 } from './providers';
 
 const meta = {
   title: 'AI RSC Demo',
@@ -67,7 +68,7 @@ export default function RootLayout({
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
-          >
+          ><Providers2>
             <div className="flex flex-col min-h-screen">
               <Header />
               <main className="flex flex-col flex-1 bg-muted/50 dark:bg-background">
@@ -79,7 +80,7 @@ export default function RootLayout({
     </div>
               </main>
             </div>
-          </Providers>
+            </Providers2>   </Providers>
         </AI>
         <Analytics />
       </body>
