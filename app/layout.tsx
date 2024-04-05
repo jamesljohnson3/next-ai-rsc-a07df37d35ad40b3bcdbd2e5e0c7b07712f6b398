@@ -5,6 +5,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
 import { ClerkProvider } from "@clerk/nextjs";
+import { SidebarDesktop } from '@/components/sidebar-desktop'
 
 import { AI } from './action';
 import { Header } from '@/components/header';
@@ -70,7 +71,12 @@ export default function RootLayout({
             <div className="flex flex-col min-h-screen">
               <Header />
               <main className="flex flex-col flex-1 bg-muted/50 dark:bg-background">
-              {authModal}     {children}
+                <div className="relative flex h-[calc(100vh_-_theme(spacing.16))] overflow-hidden">
+      <SidebarDesktop />
+      <div className="group w-full overflow-auto pl-0 animate-in duration-300 ease-in-out peer-[[data-state=open]]:lg:pl-[250px] peer-[[data-state=open]]:xl:pl-[300px]">
+      {authModal}    {children}
+      </div>
+    </div>
               </main>
             </div>
           </Providers>
