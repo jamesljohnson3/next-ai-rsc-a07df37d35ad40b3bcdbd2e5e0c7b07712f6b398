@@ -8,7 +8,6 @@ import zodToJsonSchema from 'zod-to-json-schema';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { z } from 'zod';
-import { customAlphabet } from 'nanoid'
 
 const consumeStream = async (stream: ReadableStream) => {
   const reader = stream.getReader();
@@ -17,11 +16,6 @@ const consumeStream = async (stream: ReadableStream) => {
     if (done) break;
   }
 };
-
-export const nanoid = customAlphabet(
-  '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
-  7
-) // 7-character random string
 
 export function runOpenAICompletion<
   T extends Omit<

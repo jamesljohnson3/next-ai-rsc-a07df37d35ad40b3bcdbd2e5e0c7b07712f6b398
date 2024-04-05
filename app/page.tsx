@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useUIState, useActions } from 'ai/rsc';
 import { UserMessage } from '@/components/llm-stocks/message';
-import { type AI } from '../action';
+import { type AI } from './action';
 
 import { ChatScrollAnchor } from '@/lib/hooks/chat-scroll-anchor';
 import { FooterText } from '@/components/footer';

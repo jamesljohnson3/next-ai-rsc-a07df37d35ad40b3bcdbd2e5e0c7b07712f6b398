@@ -3,7 +3,7 @@ import Link from 'next/link';
 import {
   IconGitHub,
   IconSeparator,
-
+  IconSparkles,
   IconVercel,
 } from '@/components/ui/icons';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,7 @@ export async function Header() {
         <IconSeparator className="w-6 h-6 text-muted-foreground/20" />
         <Link href="/">
           <span className="text-lg font-bold">
-
+            <IconSparkles className="inline mr-0 w-4 sm:w-5 mb-0.5" />
             AI
           </span>
         </Link>

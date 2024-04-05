@@ -6,7 +6,8 @@ import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
 import { ClerkProvider } from "@clerk/nextjs";
 
- import { Header } from '@/components/header';
+import { AI } from './action';
+import { Header } from '@/components/header';
 import { Providers } from '@/components/providers';
 
 const meta = {
@@ -59,7 +60,8 @@ export default function RootLayout({
         className={`font-sans antialiased ${GeistSans.variable} ${GeistMono.variable}`}
       >
         <Toaster />
-           <Providers
+        <AI>
+          <Providers
             attribute="class"
             defaultTheme="system"
             enableSystem
@@ -72,7 +74,8 @@ export default function RootLayout({
               </main>
             </div>
           </Providers>
-         <Analytics />
+        </AI>
+        <Analytics />
       </body>
     </html></ClerkProvider>
   );
