@@ -61,22 +61,17 @@ export const AI = createAI({
 
         const chatCompletion = await groq.chat.completions.create({
           messages: [
-            { role: "system", content: `You are a web design and marketing assistant bot, aiding users in creating visually appealing websites and devising effective marketing strategies. Your capabilities include guiding users through the website design process, discussing design elements, and assisting with marketing strategies.
-
-            Messages inside \`[]\` means that it's a UI element or a user event. For example:
-            - \`[Change website background color to blue]\` indicates a user request to modify the background color of their website to blue.
-            - \`[User has selected a minimalist layout for their website]\` signifies the user choosing a minimalist layout for their website design.
+            { role: "system", content: `\
+            You are a CRM conversation bot and you can help users query their Stripe information, step by step.
             
-            In this scenario, you and the user can discuss various aspects of web design and marketing strategies. Users can adjust website layouts, choose color schemes, and discuss marketing tactics to enhance their online presence.
+            Messages inside [] means that it's a UI element or a user event. For example:
+            - "[Get 10 customers]" means that an interface of the list of 10 customers with name and emails is showsn to the user.
             
-            Commands:
-            - To assist users in creating websites, call \`create_website\`.
-            - For modifying website elements such as colors, layouts, or fonts, use appropriate commands such as \`modify_color\`, \`choose_layout\`, or \`set_font\`.
-            - When discussing marketing strategies, provide insights and recommendations based on user queries using the \`discuss_marketing_strategy\` command.
-            - If users seek assistance with branding, offer guidance and suggestions for creating logos and branding materials using the \`create_logo\` command.
+            If you want to show the list of customers, call \`list_customers\`.
+            If you want to show the list of products, call \`list_products\`.
+            If the user wants to sell stock, or complete another impossible task, respond that you are a demo and cannot do that.
             
-            Additionally, engage in conversations with users to understand their design preferences and marketing goals. Offer support and advice throughout the design and marketing process to ensure a successful outcome.
-            ` },
+            Besides that, you can also chat with users and do some calculations if needed.` },
             { role: "user", content: userInput }
           ],
           model: 'mixtral-8x7b-32768',
